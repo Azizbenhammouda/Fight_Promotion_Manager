@@ -13,6 +13,7 @@ import (
 
 func main() {
 	dsn := os.Getenv("POSTGRES_CONFIG")
+	jwtSecret := os.Getenv("JWT_SECRET")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
@@ -24,10 +25,11 @@ func main() {
 		log.Fatal("failed to migrate:", err)
 	}
 	userRepo := users.NewUserRepository(db)
-	userService := users.NewUserService(userRepo)
+	userService := users.NewUserService(userRepo, jwtSecret)
 	userHandler := users.NewUserHandler(userService)
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /register", userHandler.Register)
+	mux.HandleFunc("POST /login", userHandler.Login)
 	fmt.Println("Server Running..")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
