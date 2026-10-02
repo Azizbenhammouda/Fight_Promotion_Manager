@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Azizbenhammouda/SoundStream/users"
+	"github.com/Azizbenhammouda/Fight_Promotion_Manager/users"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

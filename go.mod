@@ -1,4 +1,4 @@
-module github.com/Azizbenhammouda/SoundStream
+module github.com/Azizbenhammouda/Fight_Promotion_Manager
 
 go 1.26.5
 
