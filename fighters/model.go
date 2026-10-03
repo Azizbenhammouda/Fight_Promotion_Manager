@@ -1,6 +1,8 @@
 package fighters
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -15,8 +17,8 @@ type FightingSkills struct {
 type Fighter struct {
 	ID          uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	Name        string         `json:"name" gorm:"unique;not null"`
-	Age         int            `json:"age"`
-	Promotion   string         `json:"promotion"`
+	DateOfBirth time.Time      `json:"date_of_birth"`
+	Promotion   string         `json:"promotion"` // to be chnaged later by maybe promotion.id
 	Nationality string         `json:"nationality"`
 	Skills      FightingSkills `gorm:"embedded"`
 	Personality string         `json:"personality"`
