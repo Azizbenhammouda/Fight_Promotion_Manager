@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Azizbenhammouda/Fight_Promotion_Manager/fighters"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/users"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,13 +25,22 @@ func main() {
 	if err := db.AutoMigrate(&users.User{}); err != nil {
 		log.Fatal("failed to migrate:", err)
 	}
+	if err := db.AutoMigrate(&fighters.Fighter{}); err != nil {
+		log.Fatal("failed to migrate:", err)
+	}
 	userRepo := users.NewUserRepository(db)
 	userService := users.NewUserService(userRepo, jwtSecret)
 	userHandler := users.NewUserHandler(userService)
+	fighterRepo := fighters.NewFighterRepository(db)
+	fighterService := fighters.NewFighterService(fighterRepo)
+	fh := fighters.NewFighterHandler(fighterService)
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /register", userHandler.Register)
 	mux.HandleFunc("POST /login", userHandler.Login)
 	mux.Handle("GET /me", users.AuthMiddleware(jwtSecret, http.HandlerFunc(userHandler.Me)))
+	mux.Handle("POST /fighters", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.CreateFighter)))
+	mux.Handle("GET /fighters/{id}", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.GetFighter)))
+	mux.Handle("DELETE /fighters/{id}", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.DeleteFighter)))
 	fmt.Println("Server Running..")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
