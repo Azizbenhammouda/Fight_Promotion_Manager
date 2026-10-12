@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/fighters"
+	"github.com/Azizbenhammouda/Fight_Promotion_Manager/gamestate"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/promotions"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/users"
 	"gorm.io/driver/postgres"
@@ -32,6 +33,9 @@ func main() {
 	if err := db.AutoMigrate(&promotions.Promotion{}); err != nil {
 		log.Fatal("failed to migrate:", err)
 	}
+	if err := db.AutoMigrate(&gamestate.GameState{}); err != nil {
+		log.Fatal("failed to migrate:", err)
+	}
 	userRepo := users.NewUserRepository(db)
 	userService := users.NewUserService(userRepo, jwtSecret)
 	userHandler := users.NewUserHandler(userService)
@@ -41,6 +45,10 @@ func main() {
 	pr := promotions.NewPromotionRepository(db)
 	ps := promotions.NewPromotionService(pr)
 	ph := promotions.NewPromotionHandler(ps)
+	gr := gamestate.NewRepository(db)
+	gs := gamestate.NewService(gr)
+	fmt.Println(gs.GetCurrentDate())
+	fmt.Println(gs.Advance())
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /register", userHandler.Register)
 	mux.HandleFunc("POST /login", userHandler.Login)

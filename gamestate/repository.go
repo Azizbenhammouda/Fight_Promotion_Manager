@@ -20,6 +20,7 @@ func (r gameStateRepository) Get() (*GameState, error) {
 	if err := r.db.First(&state).Error; err != nil {
 		return nil, err
 	}
+	state.CurrentDate = state.CurrentDate.UTC()
 	return &state, nil
 }
 
