@@ -9,6 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type RosterGenerator interface {
+	GenerateStarterRoster(promotionID uuid.UUID, country Country) error
+}
+
 const (
 	startingBudget     int64 = 50_000
 	startingReputation int   = 5
@@ -31,12 +35,14 @@ type PromotionService interface {
 }
 
 type promotionService struct {
-	repo PromotionRepository
+	repo   PromotionRepository
+	roster RosterGenerator
 }
 
-func NewPromotionService(repo PromotionRepository) PromotionService {
+func NewPromotionService(repo PromotionRepository, roster RosterGenerator) PromotionService {
 	return promotionService{
-		repo: repo,
+		repo:   repo,
+		roster: roster,
 	}
 }
 
@@ -70,6 +76,10 @@ func (ps promotionService) CreatePromotion(ownerID uuid.UUID, input CreatePromot
 		Reputation:  startingReputation,
 	}
 	err = ps.repo.Create(&p)
+	if err != nil {
+		return nil, err
+	}
+	err = ps.roster.GenerateStarterRoster(p.ID, p.HomeCountry)
 	if err != nil {
 		return nil, err
 	}

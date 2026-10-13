@@ -9,6 +9,8 @@ import (
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/gamestate"
 )
 
+const newFightersPerTick = 2
+
 type Engine struct {
 	gameState gamestate.GameStateService
 	fighters  fighters.FighterService
@@ -47,6 +49,13 @@ func (e *Engine) Tick() (*TickResult, error) {
 				fmt.Sprintf("%s (age %d) has retired", f.Name, age))
 		}
 	}
-
+	for i := 0; i < newFightersPerTick; i++ {
+		f, err := e.GenerateFreeAgent(newDate)
+		if err != nil {
+			return nil, err
+		}
+		result.Events = append(result.Events,
+			fmt.Sprintf("New free agent: %s (%s)", f.Name, f.Nationality))
+	}
 	return result, nil
 }
