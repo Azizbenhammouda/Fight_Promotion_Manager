@@ -13,6 +13,7 @@ type FighterRepository interface {
 	Update(f *Fighter) error
 	Delete(id uuid.UUID) error
 	ListActive() ([]Fighter, error)
+	ListFreeAgents() ([]Fighter, error)
 }
 type fighterRepository struct {
 	db *gorm.DB
@@ -66,6 +67,13 @@ func (fr fighterRepository) Delete(id uuid.UUID) error {
 func (fr fighterRepository) ListActive() ([]Fighter, error) {
 	var list []Fighter
 	if err := fr.db.Where("retired = ?", false).Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+func (fr fighterRepository) ListFreeAgents() ([]Fighter, error) {
+	var list []Fighter
+	if err := fr.db.Where("retired = ? AND promotion_id IS NULL", false).Find(&list).Error; err != nil {
 		return nil, err
 	}
 	return list, nil

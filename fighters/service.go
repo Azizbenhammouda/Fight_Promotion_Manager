@@ -22,6 +22,7 @@ type FighterService interface {
 	ListActive() ([]Fighter, error)
 	RetireFighter(id uuid.UUID) error
 	CreateGeneratedFighter(f *Fighter) (*Fighter, error)
+	ListFreeAgents() ([]Fighter, error)
 }
 
 var ErrInvalidInput = errors.New("invalid input")
@@ -116,4 +117,7 @@ func (fs fighterService) CreateGeneratedFighter(f *Fighter) (*Fighter, error) {
 		return nil, err
 	}
 	return f, nil
+}
+func (fs fighterService) ListFreeAgents() ([]Fighter, error) {
+	return fs.repo.ListFreeAgents()
 }

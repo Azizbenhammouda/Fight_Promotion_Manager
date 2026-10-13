@@ -76,3 +76,16 @@ func (fh fighterHandler) DeleteFighter(w http.ResponseWriter, req *http.Request)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+func (fh fighterHandler) ListFreeAgents(w http.ResponseWriter, req *http.Request) {
+	list, err := fh.service.ListFreeAgents()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if list == nil {
+		list = []Fighter{} // send [] instead of null
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(list)
+}

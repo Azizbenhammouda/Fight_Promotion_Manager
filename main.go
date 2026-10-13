@@ -61,6 +61,7 @@ func main() {
 	mux.Handle("POST /fighters", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.CreateFighter)))
 	mux.Handle("GET /fighters/{id}", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.GetFighter)))
 	mux.Handle("DELETE /fighters/{id}", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.DeleteFighter)))
+	mux.Handle("GET /fighters/free-agents", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.ListFreeAgents)))
 	mux.Handle("POST /promotions", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.CreatePromotion)))
 	mux.Handle("GET /promotions/me", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.GetMyPromotion)))
 	mux.Handle("POST /advance", users.AuthMiddleware(jwtSecret, http.HandlerFunc(eh.Advance)))
