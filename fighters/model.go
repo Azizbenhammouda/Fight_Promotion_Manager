@@ -18,7 +18,8 @@ type Fighter struct {
 	ID          uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	Name        string         `json:"name" gorm:"unique;not null"`
 	DateOfBirth time.Time      `json:"date_of_birth"`
-	Promotion   string         `json:"promotion"` // to be chnaged later by maybe promotion.id
+	Retired     bool           `json:"retired" gorm:"not null;default:false"`
+	PromotionID *uuid.UUID     `json:"promotion_id" gorm:"type:uuid"`
 	Nationality string         `json:"nationality"`
 	Skills      FightingSkills `gorm:"embedded"`
 	Personality string         `json:"personality"`

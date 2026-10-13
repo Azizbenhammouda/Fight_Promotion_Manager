@@ -12,6 +12,7 @@ type FighterRepository interface {
 	GetByName(name string) (*Fighter, error)
 	Update(f *Fighter) error
 	Delete(id uuid.UUID) error
+	ListActive() ([]Fighter, error)
 }
 type fighterRepository struct {
 	db *gorm.DB
@@ -61,4 +62,11 @@ func (fr fighterRepository) Delete(id uuid.UUID) error {
 		return gorm.ErrRecordNotFound
 	}
 	return nil
+}
+func (fr fighterRepository) ListActive() ([]Fighter, error) {
+	var list []Fighter
+	if err := fr.db.Where("retired = ?", false).Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }

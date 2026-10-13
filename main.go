@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/Azizbenhammouda/Fight_Promotion_Manager/engine"
 
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/fighters"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/gamestate"
@@ -47,8 +51,9 @@ func main() {
 	ph := promotions.NewPromotionHandler(ps)
 	gr := gamestate.NewRepository(db)
 	gs := gamestate.NewService(gr)
-	fmt.Println(gs.GetCurrentDate())
-	fmt.Println(gs.Advance())
+	rng := rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), 1))
+	eng := engine.New(gs, fighterService, rng)
+	eh := engine.NewHandler(eng)
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /register", userHandler.Register)
 	mux.HandleFunc("POST /login", userHandler.Login)
@@ -58,6 +63,7 @@ func main() {
 	mux.Handle("DELETE /fighters/{id}", users.AuthMiddleware(jwtSecret, http.HandlerFunc(fh.DeleteFighter)))
 	mux.Handle("POST /promotions", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.CreatePromotion)))
 	mux.Handle("GET /promotions/me", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.GetMyPromotion)))
+	mux.Handle("POST /advance", users.AuthMiddleware(jwtSecret, http.HandlerFunc(eh.Advance)))
 	fmt.Println("Server Running..")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
