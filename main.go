@@ -13,6 +13,7 @@ import (
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/fighters"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/gamestate"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/promotions"
+	"github.com/Azizbenhammouda/Fight_Promotion_Manager/signing"
 	"github.com/Azizbenhammouda/Fight_Promotion_Manager/users"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -54,6 +55,8 @@ func main() {
 	pr := promotions.NewPromotionRepository(db)
 	ps := promotions.NewPromotionService(pr, eng)
 	ph := promotions.NewPromotionHandler(ps)
+	sgs := signing.NewService(db, ps)
+	sgh := signing.NewHandler(sgs)
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /register", userHandler.Register)
 	mux.HandleFunc("POST /login", userHandler.Login)
@@ -65,6 +68,7 @@ func main() {
 	mux.Handle("POST /promotions", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.CreatePromotion)))
 	mux.Handle("GET /promotions/me", users.AuthMiddleware(jwtSecret, http.HandlerFunc(ph.GetMyPromotion)))
 	mux.Handle("POST /advance", users.AuthMiddleware(jwtSecret, http.HandlerFunc(eh.Advance)))
+	mux.Handle("POST /fighters/{id}/sign", users.AuthMiddleware(jwtSecret, http.HandlerFunc(sgh.Sign)))
 	fmt.Println("Server Running..")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
