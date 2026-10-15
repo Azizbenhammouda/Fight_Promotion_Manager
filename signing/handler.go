@@ -1,6 +1,7 @@
 package signing
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -45,4 +46,26 @@ func (h *Handler) Sign(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+func (h *Handler) Roster(w http.ResponseWriter, req *http.Request) {
+	userID, ok := users.GetUserID(req.Context())
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	list, err := h.service.MyRoster(userID)
+	if err != nil {
+		if errors.Is(err, promotions.ErrPromotionNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if list == nil {
+		list = []fighters.Fighter{} // send [] instead of null
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(list)
 }
